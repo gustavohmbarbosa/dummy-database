@@ -32,27 +32,3 @@ void bst_insert(IndexTree *root, Index *value) {
         bst_insert(&(*root)->right, value);
     }
 }
-
-void _bst_write_pre_order(IndexTree root, FILE *file) {
-    if (root == NULL) {
-        return;
-    }
-
-    fwrite(root->value, sizeof(Index), 1, file);
-    _bst_write_pre_order(root->left, file);
-    _bst_write_pre_order(root->right, file);
-}
-
-void bst_write_pre_order(IndexTree root, char *filename) {
-    if (root == NULL) {
-        return;
-    }
-
-	FILE *file;
-	file = fopen(filename, "wb");
-	if (file != NULL) {
-        _bst_write_pre_order(root, file);
-		fclose(file);
-	}
-}
-

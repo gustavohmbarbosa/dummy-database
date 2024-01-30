@@ -16,6 +16,4 @@ typedef IndexNode * IndexTree;
 
 void bst_insert(IndexTree *root, Index *value);
 
-void bst_write_pre_order(IndexTree root, char *filename);
-
 #endif

@@ -10,17 +10,72 @@ void load_bst_index(char *filename, IndexTree *tree) {
     *tree = NULL;
 
     FILE *file = fopen(filename, "rb");
-    Index *temp;
     if (file == NULL) {
         return;
     }
 
-    temp = (Index *) malloc(sizeof(Index));
-    while (fread(temp, sizeof(Index), 1, file)) {
-        bst_insert(tree, temp);
+    Index *temp = NULL;
+    long offset = 0;
+    fseek(file, 0L, SEEK_SET);
+    do {
         temp = (Index *) malloc(sizeof(Index));
-    }
+        offset = fscanf(file, "%d;", &temp->key_type);
+
+        switch(temp->key_type) {
+            case 0:
+                free(temp);
+                fclose(file);
+                return;
+            case KEY_TYPE_INT:
+                temp->key = (int *) malloc(sizeof(int));
+                fscanf(file, "%d;%ld\n", (int *) temp->key, &offset);
+                break;
+            case KEY_TYPE_STRING:
+                fscanf(file, "%m[^;];%ld\n", (char **) &temp->key, &offset);
+                break;
+            default:
+                printf("Invalid key type: %d\n", temp->key_type);
+                exit(1);
+        }
+
+        bst_insert(tree, temp);
+    } while (offset != EOF);
+
     fclose(file);
+}
+
+void _bst_write_pre_order(IndexTree root, FILE *file) {
+    if (root == NULL) {
+        return;
+    }
+
+    switch (root->value->key_type) {
+        case KEY_TYPE_INT:
+            fprintf(file, "%d;%d;%d\n", root->value->key_type, *(int *) root->value->key, root->value->offset);
+            break;
+        case KEY_TYPE_STRING:
+            fprintf(file, "%d;%s;%d\n", root->value->key_type, (char *) root->value->key, root->value->offset);
+            break;
+        default:
+            printf("Invalid key type: %d\n", root->value->key_type);
+            exit(1);
+    }
+
+    _bst_write_pre_order(root->left, file);
+    _bst_write_pre_order(root->right, file);
+}
+
+void bst_write_pre_order(IndexTree root, char *filename) {
+    if (root == NULL) {
+        return;
+    }
+
+	FILE *file;
+	file = fopen(filename, "wb");
+	if (file != NULL) {
+        _bst_write_pre_order(root, file);
+		fclose(file);
+	}
 }
 
 void boot_reviews(Table *table) {
@@ -65,7 +120,7 @@ void store_review(Table *table, Review *review) {
     fseek(table->file, 0L, SEEK_END);
     int offset = ftell(table->file);
 
-    Index *id_index = (Index *) malloc(sizeof(Index));    
+    Index *id_index = (Index *) malloc(sizeof(Index));
     id_index->key_type = KEY_TYPE_INT;
     id_index->key = &review->id;
     id_index->offset = offset;
@@ -86,52 +141,20 @@ void store_review(Table *table, Review *review) {
     bst_insert(&table->movie_index, movie_index);
 }
 
+void print_reviews(Table *table) {
+    if (table->file == NULL) {
+        return;
+    }
 
+    fseek(table->file, 0L, SEEK_SET);
+    Review *review = (Review *) malloc(sizeof(Review));
+    while (fscanf(table->file, "%d;%m[^;];%m[^;];%d;%ld\n", &review->id, &review->reviewer, &review->movie, &review->rating, &review->timestamp) != EOF) {
+        printf("ID: %d\n", review->id);
+        printf("Reviewer: %s\n", review->reviewer);
+        printf("Movie: %s\n", review->movie);
+        printf("Rating: %d\n", review->rating);
+        printf("Timestamp: %ld\n\n", review->timestamp);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-// int save_all_reviews(ReviewList *list) {
-//     FILE *file = fopen(REVIEWS_FILENAME, "wb");
-
-//     if (file == NULL) {
-//         perror("Error opening file");
-//         return 0;
-//     }
-
-//     fwrite(list->items, sizeof(Review), list->length, file);
-//     fclose(file);
-//     return 1;
-// }
-
-// ReviewList *load_all_reviews() {
-//     ReviewList *list = NULL;
-
-//     FILE *file = fopen(REVIEWS_FILENAME, "rb");
-//     if (file == NULL) {
-//         perror("Error opening file");
-//         return list;
-//     }
-
-//     fseek(file, 0, SEEK_END);
-//     long file_size = ftell(file);
-//     rewind(file);
-
-//     list = (ReviewList *) malloc(sizeof(ReviewList));
-//     list->length = file_size / sizeof(Review);
-//     list->items = (Review *) malloc(list->length * sizeof(Review));
-
-//     fread(list->items, sizeof(Review), list->length, file);
-//     fclose(file);
-
-//     return list;
-// }
+    free(review);
+}
