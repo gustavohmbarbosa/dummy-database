@@ -16,4 +16,8 @@ typedef IndexNode * IndexTree;
 
 void bst_insert(IndexTree *root, Index *value);
 
+void bst_remove(IndexTree *root, Index *value);
+
+void bst_search_offset(IndexTree root, Index *value);
+
 #endif

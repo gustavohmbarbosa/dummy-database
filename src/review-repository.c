@@ -140,23 +140,25 @@ void store_review(Table *table, Review *review) {
     bst_insert(&table->movie_index, movie_index);
 }
 
-void print_reviews(Table *table, IndexTree tree) {
-    if (tree == NULL || table->file == NULL) {
-        return;
-    }
-
-    print_reviews(table, tree->left);
-
-    fseek(table->file, tree->value->offset, SEEK_SET);
+void print_review(Table *table, int offset) {
+    fseek(table->file, offset, SEEK_SET);
     Review *review = (Review *) malloc(sizeof(Review));
     fscanf(table->file, "%d;%m[^;];%m[^;];%d;%ld\n", &review->id, &review->reviewer, &review->movie, &review->rating, &review->timestamp);
-    printf("FILE OFFSET: %d\n", tree->value->offset);
+    printf("FILE OFFSET: %d\n", offset);
     printf("ID: %d\n", review->id);
     printf("Reviewer: %s\n", review->reviewer);
     printf("Movie: %s\n", review->movie);
     printf("Rating: %d\n", review->rating);
     printf("Timestamp: %ld\n\n", review->timestamp);
     free(review);
-    
+}
+
+void print_reviews(Table *table, IndexTree tree) {
+    if (tree == NULL || table->file == NULL) {
+        return;
+    }
+
+    print_reviews(table, tree->left);
+    print_review(table, tree->value->offset);    
     print_reviews(table, tree->right);
 }

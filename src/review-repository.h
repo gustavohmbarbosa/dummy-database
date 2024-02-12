@@ -15,6 +15,8 @@ void shutdown_reviews(Table *table);
 
 void store_review(Table *table, Review *review);
 
+void print_review(Table *table, int offset);
+
 void print_reviews(Table *table, IndexTree tree);
 
 #endif
