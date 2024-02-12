@@ -15,9 +15,6 @@ void shutdown_reviews(Table *table);
 
 void store_review(Table *table, Review *review);
 
-void print_reviews(Table *table);
-
-// int save_all_reviews(ReviewList *list);
-// ReviewList *load_all_reviews();
+void print_reviews(Table *table, IndexTree tree);
 
 #endif

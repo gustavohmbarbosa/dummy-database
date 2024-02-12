@@ -9,7 +9,7 @@
 void load_bst_index(char *filename, IndexTree *tree) {
     *tree = NULL;
 
-    FILE *file = fopen(filename, "rb");
+    FILE *file = fopen(filename, "r+b");
     if (file == NULL) {
         return;
     }
@@ -28,16 +28,15 @@ void load_bst_index(char *filename, IndexTree *tree) {
                 return;
             case KEY_TYPE_INT:
                 temp->key = (int *) malloc(sizeof(int));
-                fscanf(file, "%d;%ld\n", (int *) temp->key, &offset);
+                fscanf(file, "%d;%d\n", (int *) temp->key, &(temp->offset));
                 break;
             case KEY_TYPE_STRING:
-                fscanf(file, "%m[^;];%ld\n", (char **) &temp->key, &offset);
+                fscanf(file, "%m[^;];%d\n", (char **) &temp->key, &(temp->offset));
                 break;
             default:
                 printf("Invalid key type: %d\n", temp->key_type);
                 exit(1);
         }
-
         bst_insert(tree, temp);
     } while (offset != EOF);
 
@@ -79,7 +78,7 @@ void bst_write_pre_order(IndexTree root, char *filename) {
 }
 
 void boot_reviews(Table *table) {
-    FILE *file = fopen(REVIEWS_FILENAME, "a+b");
+    FILE *file = fopen(REVIEWS_FILENAME, "r+b");
     if (file == NULL) {
         printf("Error opening %s", REVIEWS_FILENAME);
         exit(1);
@@ -141,20 +140,23 @@ void store_review(Table *table, Review *review) {
     bst_insert(&table->movie_index, movie_index);
 }
 
-void print_reviews(Table *table) {
-    if (table->file == NULL) {
+void print_reviews(Table *table, IndexTree tree) {
+    if (tree == NULL || table->file == NULL) {
         return;
     }
 
-    fseek(table->file, 0L, SEEK_SET);
-    Review *review = (Review *) malloc(sizeof(Review));
-    while (fscanf(table->file, "%d;%m[^;];%m[^;];%d;%ld\n", &review->id, &review->reviewer, &review->movie, &review->rating, &review->timestamp) != EOF) {
-        printf("ID: %d\n", review->id);
-        printf("Reviewer: %s\n", review->reviewer);
-        printf("Movie: %s\n", review->movie);
-        printf("Rating: %d\n", review->rating);
-        printf("Timestamp: %ld\n\n", review->timestamp);
-    }
+    print_reviews(table, tree->left);
 
+    fseek(table->file, tree->value->offset, SEEK_SET);
+    Review *review = (Review *) malloc(sizeof(Review));
+    fscanf(table->file, "%d;%m[^;];%m[^;];%d;%ld\n", &review->id, &review->reviewer, &review->movie, &review->rating, &review->timestamp);
+    printf("FILE OFFSET: %d\n", tree->value->offset);
+    printf("ID: %d\n", review->id);
+    printf("Reviewer: %s\n", review->reviewer);
+    printf("Movie: %s\n", review->movie);
+    printf("Rating: %d\n", review->rating);
+    printf("Timestamp: %ld\n\n", review->timestamp);
     free(review);
+    
+    print_reviews(table, tree->right);
 }
