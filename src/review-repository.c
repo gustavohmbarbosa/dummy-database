@@ -65,16 +65,20 @@ void _bst_write_pre_order(IndexTree root, FILE *file) {
 }
 
 void bst_write_pre_order(IndexTree root, char *filename) {
-    if (root == NULL) {
+	FILE *file;
+	file = fopen(filename, "wb");
+	if (file == NULL) {
+        fclose(file);
         return;
     }
 
-	FILE *file;
-	file = fopen(filename, "wb");
-	if (file != NULL) {
-        _bst_write_pre_order(root, file);
-		fclose(file);
-	}
+    if (root == NULL) {
+        fclose(file);
+        return;
+    }
+        
+    _bst_write_pre_order(root, file);
+    fclose(file);
 }
 
 void boot_reviews(Table *table) {
@@ -140,11 +144,17 @@ void store_review(Table *table, Review *review) {
     bst_insert(&table->movie_index, movie_index);
 }
 
-void print_review(Table *table, int offset) {
-    fseek(table->file, offset, SEEK_SET);
+Review * get_review_from_file(FILE *file, int offset) {
+    fseek(file, offset, SEEK_SET);
     Review *review = (Review *) malloc(sizeof(Review));
-    fscanf(table->file, "%d;%m[^;];%m[^;];%d;%ld\n", &review->id, &review->reviewer, &review->movie, &review->rating, &review->timestamp);
+    fscanf(file, "%d;%m[^;];%m[^;];%d;%ld\n", &review->id, &review->reviewer, &review->movie, &review->rating, &review->timestamp);
+    return review;
+}
+
+void print_review(Table *table, int offset) {
+    Review *review = get_review_from_file(table->file, offset);
     printf("FILE OFFSET: %d\n", offset);
+
     printf("ID: %d\n", review->id);
     printf("Reviewer: %s\n", review->reviewer);
     printf("Movie: %s\n", review->movie);
@@ -161,4 +171,17 @@ void print_reviews(Table *table, IndexTree tree) {
     print_reviews(table, tree->left);
     print_review(table, tree->value->offset);    
     print_reviews(table, tree->right);
+}
+
+Review *search_review(Table *table, IndexTree tree, Index *index) {
+    if (table->file == NULL) {
+        return NULL;
+    }
+
+    bst_search_offset(tree, index);
+    if (index->offset == -1) {
+        return NULL;
+    }
+
+    return get_review_from_file(table->file, index->offset);
 }

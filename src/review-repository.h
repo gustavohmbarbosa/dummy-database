@@ -19,4 +19,6 @@ void print_review(Table *table, int offset);
 
 void print_reviews(Table *table, IndexTree tree);
 
+Review *search_review(Table *table, IndexTree tree, Index *index);
+
 #endif

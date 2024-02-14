@@ -61,17 +61,21 @@ void bst_cut_sheet(IndexTree *sheet) {
     *sheet = NULL;
 }
 
-void bst_remove(IndexTree *root, Index *value) {
+void bst_remove(IndexTree *root, int key_type, void *key_value) {
     if (*root == NULL) {
         return;
     }
     
-    if (_is_smaller(value->key_type, value->key, (*root)->value->key)) {
-        return bst_remove(&(*root)->left, value);
+    if (_is_smaller(key_type, key_value, (*root)->value->key)) {
+        return bst_remove(&(*root)->left, key_type, key_value);
     }
 
-    if (_is_bigger(value->key_type, value->key, (*root)->value->key)) {
-        return bst_remove(&(*root)->right, value);
+    if (_is_bigger(key_type, key_value, (*root)->value->key)) {
+        return bst_remove(&(*root)->right, key_type, key_value);
+    }
+
+    if (!_is_equal(key_type, key_value, (*root)->value->key)) {
+        return;
     }
 
     if ((*root)->left == NULL && (*root)->right == NULL) {

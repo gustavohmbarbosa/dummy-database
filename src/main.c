@@ -79,6 +79,84 @@ void search_by_movie(Table *table) {
     free(temp_index.key); // TODO: is this necessary?
 }
 
+void delete_header() {
+    system("clear");
+    printf("==============================\n");
+    printf("       EXCLUIR AVALIAÇÃO      \n");
+    printf("==============================\n");
+}
+
+void delete_by_id(Table *table) {
+    delete_header();
+    Index id_index;
+    id_index.key_type = KEY_TYPE_INT;
+    id_index.key = malloc(sizeof(int));
+    printf("Informe o ID da avaliação: ");
+    scanf("%d", (int *) id_index.key);
+
+    Review *review = search_review(table, table->id_index, &id_index);
+    if (review == NULL) {
+        system("clear");
+        printf("Avaliação não encontrada\n\n");
+        return;
+    }    
+
+    bst_remove(&(table->id_index), id_index.key_type, id_index.key);
+    bst_remove(&(table->movie_index), KEY_TYPE_STRING, review->movie);
+    bst_remove(&(table->rating_index), KEY_TYPE_INT, &review->rating);
+
+    system("clear");
+    printf("Avaliação excluída com sucesso!\n\n");
+}
+
+void delete_by_rating(Table *table) {
+    delete_header();
+    Index rating_index;
+    rating_index.key_type = KEY_TYPE_INT;
+    rating_index.key = malloc(sizeof(int));
+    printf("Informe a nota da avaliação: ");
+    scanf("%d", (int *) rating_index.key);
+
+    Review *review = search_review(table, table->rating_index, &rating_index);
+    if (review == NULL) {
+        system("clear");
+        printf("Avaliação não encontrada\n\n");
+        return;
+    }    
+
+    bst_remove(&(table->rating_index), rating_index.key_type, rating_index.key);
+    bst_remove(&(table->movie_index), KEY_TYPE_STRING, review->movie);
+    bst_remove(&(table->id_index), KEY_TYPE_INT, &review->id);
+
+    system("clear");
+    printf("Avaliação excluída com sucesso!\n\n");
+}
+
+void delete_by_movie(Table *table) {
+    delete_header();
+    Index movie_index;
+    movie_index.key_type = KEY_TYPE_STRING;
+    getchar();
+    printf("Informe o nome do filme: ");
+    size_t len = 0;
+    getline((char **) &movie_index.key, &len, stdin);
+    ((char *) movie_index.key)[strcspn(movie_index.key, "\n")] = '\0';  // Remove newline if present
+
+    Review *review = search_review(table, table->movie_index, &movie_index);
+    if (review == NULL) {
+        system("clear");
+        printf("Avaliação não encontrada\n\n");
+        return;
+    }    
+
+    bst_remove(&(table->movie_index), movie_index.key_type, movie_index.key);
+    bst_remove(&(table->id_index), KEY_TYPE_INT, &review->id);
+    bst_remove(&(table->rating_index), KEY_TYPE_INT, &review->rating);
+
+    system("clear");
+    printf("Avaliação excluída com sucesso!\n\n");
+}
+
 int main() {
 	Table table;
 	int option;
@@ -95,9 +173,9 @@ int main() {
         printf("[5] Buscar por ID\n");
         printf("[6] Buscar por AVALIAÇÃO\n");
         printf("[7] Buscar por FILME\n");
-        // printf("[5] Excluir por ID\n");
-        // printf("[6] Excluir por filme\n");
-        // printf("[7] Excluir por nota\n");
+        printf("[8] Excluir por ID\n");
+        printf("[9] Excluir por AVALIAÇÃO\n");
+        printf("[10] Excluir por FILME\n");
         printf("[99] Sair\n");
 
         printf("Escolha uma opção: ");
@@ -136,17 +214,13 @@ int main() {
                 search_by_movie(&table);
                 break;
             case 8:
-                system("clear");
-                printf("============================\n");
-                printf("       EXCLUIR POR ID       \n");
-                printf("============================\n");
-                Index temp_index;
-                temp_index.key_type = KEY_TYPE_INT;
-                temp_index.key = malloc(sizeof(int));
-                printf("Informe o ID da avaliação: ");
-                scanf("%d", (int *) temp_index.key);
-                bst_remove(&(table.id_index), &temp_index);
-                printf("\n");
+                delete_by_id(&table);
+                break;
+            case 9:
+                delete_by_rating(&table);
+                break;
+            case 10:
+                delete_by_movie(&table);
                 break;
             case 99:
                 shutdown_reviews(&table);
