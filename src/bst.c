@@ -40,6 +40,18 @@ int bst_value_is_equal(int key_type, void *first, void *second) {
     }
 }
 
+int bst_height(IndexTree node) {
+    if (node == NULL) {
+        return 0;
+    }
+
+    int a = bst_height(node->left);
+    int b = bst_height(node->right);
+    int max = (a > b) ? a : b;
+
+    return 1 + max;
+}
+
 void bst_insert(IndexTree *root, Index *value) {
     if (*root == NULL) {
         *root = (IndexTree) malloc(sizeof(Index)); 

@@ -12,13 +12,15 @@ typedef struct IndexNode {
 	struct IndexNode *left, *right;
 } IndexNode;
 
-typedef IndexNode * IndexTree;
+typedef IndexNode *IndexTree;
 
 int bst_value_is_smaller(int key_type, void *smallest, void *biggest);
 
 int bst_value_is_bigger(int key_type, void *biggest, void *smallest);
 
 int bst_value_is_equal(int key_type, void *first, void *second);
+
+int bst_height(IndexTree node);
 
 void bst_insert(IndexTree *root, Index *value);
 

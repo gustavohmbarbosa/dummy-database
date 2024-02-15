@@ -1,5 +1,6 @@
 #include "review.h"
 #include "review-repository.h"
+#include "avl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -139,7 +140,7 @@ void store_review(Table *table, Review *review) {
     movie_index->offset = offset;
 
     fprintf(table->file, "%d;%s;%s;%d;%ld\n", review->id, review->reviewer, review->movie, review->rating, review->timestamp);
-    bst_insert(&table->id_index, id_index);
+    avl_insert((IndexAVLTree *) &table->id_index, id_index);
     bst_insert(&table->rating_index, rating_index);
     bst_insert(&table->movie_index, movie_index);
 }
