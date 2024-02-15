@@ -9,7 +9,7 @@ int bst_value_is_smaller(int key_type, void *smallest, void *biggest) {
         case KEY_TYPE_INT:
             return (*(int *) smallest < *(int *) biggest);
         case KEY_TYPE_STRING:
-            return (strcmp((char *) smallest, (char *) biggest) > 0);
+            return (strcmp((char *) smallest, (char *) biggest) < 0);
         default:
             printf("Invalid key type: %d\n", key_type);
             exit(1);
@@ -21,7 +21,7 @@ int bst_value_is_bigger(int key_type, void *biggest, void *smallest) {
         case KEY_TYPE_INT:
             return (*(int *) biggest > *(int *) smallest);
         case KEY_TYPE_STRING:
-            return (strcmp((char *) smallest, (char *) biggest) < 0);
+            return (strcmp((char *) smallest, (char *) biggest) > 0);
         default:
             printf("Invalid key type: %d\n", key_type);
             exit(1);
