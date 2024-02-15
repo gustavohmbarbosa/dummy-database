@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int _is_smaller(int key_type, void *smallest, void *biggest) {
+int bst_value_is_smaller(int key_type, void *smallest, void *biggest) {
     switch (key_type) {
         case KEY_TYPE_INT:
             return (*(int *) smallest < *(int *) biggest);
@@ -16,7 +16,7 @@ int _is_smaller(int key_type, void *smallest, void *biggest) {
     }
 }
 
-int _is_bigger(int key_type, void *biggest, void *smallest) {
+int bst_value_is_bigger(int key_type, void *biggest, void *smallest) {
     switch (key_type) {
         case KEY_TYPE_INT:
             return (*(int *) biggest > *(int *) smallest);
@@ -28,7 +28,7 @@ int _is_bigger(int key_type, void *biggest, void *smallest) {
     }
 }
 
-int _is_equal(int key_type, void *first, void *second) {
+int bst_value_is_equal(int key_type, void *first, void *second) {
     switch (key_type) {
         case KEY_TYPE_INT:
             return (*(int *) first == *(int *) second);
@@ -49,7 +49,7 @@ void bst_insert(IndexTree *root, Index *value) {
         return;
     }
 
-    if (_is_smaller(value->key_type, value->key, (*root)->value->key)) {
+    if (bst_value_is_smaller(value->key_type, value->key, (*root)->value->key)) {
         bst_insert(&(*root)->left, value);
     } else {
         bst_insert(&(*root)->right, value);
@@ -66,15 +66,15 @@ void bst_remove(IndexTree *root, int key_type, void *key_value) {
         return;
     }
     
-    if (_is_smaller(key_type, key_value, (*root)->value->key)) {
+    if (bst_value_is_smaller(key_type, key_value, (*root)->value->key)) {
         return bst_remove(&(*root)->left, key_type, key_value);
     }
 
-    if (_is_bigger(key_type, key_value, (*root)->value->key)) {
+    if (bst_value_is_bigger(key_type, key_value, (*root)->value->key)) {
         return bst_remove(&(*root)->right, key_type, key_value);
     }
 
-    if (!_is_equal(key_type, key_value, (*root)->value->key)) {
+    if (!bst_value_is_equal(key_type, key_value, (*root)->value->key)) {
         return;
     }
 
@@ -112,15 +112,15 @@ void bst_search_offset(IndexTree root, Index *value) {
         return;
     }
 
-    if (_is_smaller(value->key_type, value->key, root->value->key)) {
+    if (bst_value_is_smaller(value->key_type, value->key, root->value->key)) {
         return bst_search_offset(root->left, value);
     }
 
-    if (_is_bigger(value->key_type, value->key, root->value->key)) {
+    if (bst_value_is_bigger(value->key_type, value->key, root->value->key)) {
         return bst_search_offset(root->right, value);
     }
 
-    if (_is_equal(value->key_type, value->key, root->value->key)) {
+    if (bst_value_is_equal(value->key_type, value->key, root->value->key)) {
         value->offset = root->value->offset;
         return;
     }
