@@ -1,5 +1,6 @@
 #include "review.h"
 #include "review-repository.h"
+#include "bst.h"
 #include "avl.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +8,7 @@
 #include <time.h>
 #include "constants.h"
 
-void load_bst_index(char *filename, IndexTree *tree) {
+void load_index(void (*tree_insert)(IndexTree *, Index *), char *filename, IndexTree *tree) {
     *tree = NULL;
 
     FILE *file = fopen(filename, "r+b");
@@ -38,7 +39,7 @@ void load_bst_index(char *filename, IndexTree *tree) {
                 printf("Invalid key type: %d\n", temp->key_type);
                 exit(1);
         }
-        bst_insert(tree, temp);
+        tree_insert(tree, temp);
     } while (offset != EOF);
 
     fclose(file);
@@ -90,9 +91,9 @@ void boot_reviews(Table *table) {
     }
 
     table->file = file;
-    load_bst_index(REVIEWS_INDEX_ID, &table->id_index);
-    load_bst_index(REVIEWS_INDEX_MOVIE, &table->movie_index);
-    load_bst_index(REVIEWS_INDEX_RATING, &table->rating_index);
+    load_index((void (*)(IndexTree *, Index *)) avl_insert, REVIEWS_INDEX_ID, &table->id_index);
+    load_index(bst_insert, REVIEWS_INDEX_MOVIE, &table->movie_index);
+    load_index(bst_insert, REVIEWS_INDEX_RATING, &table->rating_index);
 }
 
 void shutdown_reviews(Table *table) {
