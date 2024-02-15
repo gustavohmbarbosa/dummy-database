@@ -2,6 +2,7 @@
 #include "review-repository.h"
 #include "bst.h"
 #include "avl.h"
+#include "rb.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -93,7 +94,7 @@ void boot_reviews(Table *table) {
     table->file = file;
     load_index((void (*)(IndexTree *, Index *)) avl_insert, REVIEWS_INDEX_ID, &table->id_index);
     load_index(bst_insert, REVIEWS_INDEX_MOVIE, &table->movie_index);
-    load_index(bst_insert, REVIEWS_INDEX_RATING, &table->rating_index);
+    load_index((void (*)(IndexTree *, Index *)) rb_insert, REVIEWS_INDEX_RATING, &table->rating_index);
 }
 
 void shutdown_reviews(Table *table) {
@@ -142,7 +143,7 @@ void store_review(Table *table, Review *review) {
 
     fprintf(table->file, "%d;%s;%s;%d;%ld\n", review->id, review->reviewer, review->movie, review->rating, review->timestamp);
     avl_insert((IndexAVLTree *) &table->id_index, id_index);
-    bst_insert(&table->rating_index, rating_index);
+    rb_insert((IndexRBTree *) &table->rating_index, rating_index);
     bst_insert(&table->movie_index, movie_index);
 }
 
