@@ -15,6 +15,6 @@ typedef IndexRBNode *IndexRBTree;
 
 void rb_insert(IndexRBTree *root, Index *value);
 
-// void rb_delete(IndexRBTree *root, int key_type, void *key_value);
+void rb_delete(IndexRBTree *root, int key_type, void *key_value);
 
 #endif
