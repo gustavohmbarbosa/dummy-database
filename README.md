@@ -8,5 +8,6 @@ It currently simulates the internal operating logic of a Database Management Sys
 
 # TODO
 * Fix auto-increment logic
-* Create a index using an AVL tree
 * Create a index using an RB tree
+* Refactor code
+* Create tests

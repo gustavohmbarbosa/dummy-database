@@ -13,4 +13,6 @@ typedef IndexAVLNode *IndexAVLTree;
 
 void avl_insert(IndexAVLTree *root, Index *value);
 
+void avl_delete(IndexAVLTree *root, int key_type, void *key_value);
+
 #endif

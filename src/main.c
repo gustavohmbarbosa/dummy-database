@@ -1,4 +1,5 @@
 #include "bst.h"
+#include "avl.h"
 #include "constants.h"
 #include "review.h"
 #include "review-repository.h"
@@ -99,9 +100,9 @@ void delete_by_id(Table *table) {
         system("clear");
         printf("Avaliação não encontrada\n\n");
         return;
-    }    
+    }
 
-    bst_remove(&(table->id_index), id_index.key_type, id_index.key);
+    avl_delete((IndexAVLTree *) &(table->id_index), id_index.key_type, id_index.key);
     bst_remove(&(table->movie_index), KEY_TYPE_STRING, review->movie);
     bst_remove(&(table->rating_index), KEY_TYPE_INT, &review->rating);
 
@@ -126,7 +127,7 @@ void delete_by_rating(Table *table) {
 
     bst_remove(&(table->rating_index), rating_index.key_type, rating_index.key);
     bst_remove(&(table->movie_index), KEY_TYPE_STRING, review->movie);
-    bst_remove(&(table->id_index), KEY_TYPE_INT, &review->id);
+    avl_delete((IndexAVLTree *) &(table->id_index), KEY_TYPE_INT, &review->id);
 
     system("clear");
     printf("Avaliação excluída com sucesso!\n\n");
@@ -150,7 +151,7 @@ void delete_by_movie(Table *table) {
     }    
 
     bst_remove(&(table->movie_index), movie_index.key_type, movie_index.key);
-    bst_remove(&(table->id_index), KEY_TYPE_INT, &review->id);
+    avl_delete((IndexAVLTree *) &(table->id_index), KEY_TYPE_INT, &review->id);
     bst_remove(&(table->rating_index), KEY_TYPE_INT, &review->rating);
 
     system("clear");
